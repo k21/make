@@ -1,5 +1,5 @@
-OBJS = graph.o list.o main.o xmalloc.o
-HEADERS = graph.h list.h xmalloc.h
+OBJS = graph.o list.o main.o string.o xmalloc.o
+HEADERS = graph.h list.h string.h xmalloc.h
 
 make: $(OBJS)
 	gcc $(LDFLAGS) -o $@ $(OBJS)
@@ -14,4 +14,7 @@ graph.o: graph.c $(HEADERS)
 	gcc -c -Wall -Wextra -Wconversion $(CFLAGS) -o $@ $<
 
 list.o: list.c $(HEADERS)
+	gcc -c -Wall -Wextra -Wconversion $(CFLAGS) -o $@ $<
+
+string.o: string.c $(HEADERS)
 	gcc -c -Wall -Wextra -Wconversion $(CFLAGS) -o $@ $<
