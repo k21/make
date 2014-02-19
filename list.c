@@ -14,9 +14,13 @@ struct list_item {
 	void *data;
 };
 
-void list_init(struct list *list) {
+struct list *list_init() {
+	struct list *list = xmalloc(sizeof (*list));
+
 	list->head = NULL;
 	list->tail = NULL;
+
+	return (list);
 }
 
 void list_destroy(struct list *list) {
@@ -27,6 +31,8 @@ void list_destroy(struct list *list) {
 		free(item);
 		item = next_item;
 	}
+
+	free(list);
 }
 
 void list_add(struct list *list, void *data) {

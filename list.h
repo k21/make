@@ -4,7 +4,7 @@
 struct list;
 struct list_item;
 
-void list_init(struct list *list);
+struct list *list_init();
 void list_destroy(struct list *list);
 void list_add(struct list *list, void *data);
 void list_remove(struct list *list, struct list_item *item);
