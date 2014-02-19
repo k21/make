@@ -77,6 +77,19 @@ struct list_item *list_next(struct list_item *item) {
 	return (item->next);
 }
 
+struct list_item *list_find(struct list *list, void *data) {
+	struct list_item *item = list->head;
+
+	while (item) {
+		if (item->data == data) {
+			return (item);
+		}
+		item = item->next;
+	}
+
+	return (NULL);
+}
+
 void *list_get_data(struct list_item *item) {
 	return (item->data);
 }
