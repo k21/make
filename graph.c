@@ -219,6 +219,10 @@ static void mark_needed_dfs(struct list *stack) {
 		node = list_front(stack);
 		list_pop_front(stack);
 
+		if (node->visit == 1) {
+			continue;
+		}
+
 		assert(node->visit == 0);
 		node->visit = 1;
 
