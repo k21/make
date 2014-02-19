@@ -42,6 +42,14 @@ const char *string_get_cstr(const struct string *string) {
 	return (string->data);
 }
 
+int string_equal(const struct string *s1, const struct string *s2) {
+	if (s1->used != s2->used) {
+		return (0);
+	}
+
+	return (memcpy(s1->data, s2->data, s1->used) == 0);
+}
+
 void string_reserve(struct string *string, size_t capacity) {
 	++capacity;
 
