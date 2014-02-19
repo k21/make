@@ -12,6 +12,7 @@ void list_push_front(struct list *list, void *data);
 void list_pop_back(struct list *list);
 void list_pop_front(struct list *list);
 void list_remove(struct list *list, struct list_item *item);
+void list_clear(struct list *list);
 
 int list_empty(const struct list *list);
 struct list_item *list_head(struct list *list);

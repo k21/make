@@ -25,14 +25,7 @@ struct list *list_init() {
 }
 
 void list_destroy(struct list *list) {
-	struct list_item *item = list->head;
-
-	while (item) {
-		struct list_item *next_item = item->next;
-		free(item);
-		item = next_item;
-	}
-
+	list_clear(list);
 	free(list);
 }
 
@@ -94,6 +87,19 @@ void list_remove(struct list *list, struct list_item *item) {
 	}
 
 	free(item);
+}
+
+void list_clear(struct list *list) {
+	struct list_item *item = list->head;
+
+	while (item) {
+		struct list_item *next_item = item->next;
+		free(item);
+		item = next_item;
+	}
+
+	list->head = NULL;
+	list->tail = NULL;
 }
 
 int list_empty(const struct list *list) {
