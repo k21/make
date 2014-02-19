@@ -18,6 +18,8 @@ struct graph_node {
 	struct timespec time;
 	int target;
 	int visit;
+	int needs_update;
+	int exists;
 };
 
 struct graph *graph_init() {
@@ -83,6 +85,18 @@ struct graph_node *graph_get_node_by_name(
 	return (NULL);
 }
 
+static int newer(const struct graph_node *n1, const struct graph_node *n2) {
+	if (n1->needs_update || !n2->exists) {
+		return (1);
+	}
+
+	if (n1->time.tv_sec != n2->time.tv_sec) {
+		return (n1->time.tv_sec > n2->time.tv_sec);
+	}
+
+	return (n1->time.tv_nsec > n2->time.tv_nsec);
+}
+
 void graph_add_dependency(
 		struct graph *graph,
 		struct graph_node *dependent,
@@ -118,6 +132,10 @@ void graph_remove_dependency(
 
 	if (list_empty(dependent->dependencies)) {
 		list_push_back(graph->ready_nodes, dependent);
+	}
+
+	if (newer(dependency, dependent)) {
+		dependent->needs_update = 1;
 	}
 }
 
@@ -280,8 +298,11 @@ struct graph_node *graph_node_init(const struct string *name) {
 
 	node->time.tv_sec = 0;
 	node->time.tv_nsec = 0;
+
 	node->target = 0;
 	node->visit = 0;
+	node->needs_update = 0;
+	node->exists = 0;
 
 	return (node);
 }
@@ -306,8 +327,17 @@ const struct string *graph_node_get_name(const struct graph_node *node) {
 void graph_node_set_time(struct graph_node *node, const struct timespec *time) {
 	node->time.tv_sec  = time->tv_sec;
 	node->time.tv_nsec = time->tv_nsec;
+	node->exists = 1;
 }
 
 void graph_node_mark_target(struct graph_node *node) {
 	node->target = 1;
+}
+
+int graph_node_needs_update(const struct graph_node *node) {
+	return (node->needs_update);
+}
+
+int graph_node_exists(const struct graph_node *node) {
+	return (node->exists);
 }
