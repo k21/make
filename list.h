@@ -19,4 +19,7 @@ struct list_item *list_next(struct list_item *item);
 struct list_item *list_find(struct list *list, void *data);
 void *list_get_data(struct list_item *item);
 
+void *list_front(const struct list *list);
+void *list_back(const struct list *list);
+
 #endif

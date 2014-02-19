@@ -124,3 +124,13 @@ struct list_item *list_find(struct list *list, void *data) {
 void *list_get_data(struct list_item *item) {
 	return (item->data);
 }
+
+void *list_front(const struct list *list) {
+	assert(list->head != NULL);
+	return (list->head->data);
+}
+
+void *list_back(const struct list *list) {
+	assert(list->tail != NULL);
+	return (list->tail->data);
+}
