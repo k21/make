@@ -3,6 +3,7 @@
 
 #include <time.h>
 
+#include "list.h"
 #include "string.h"
 
 struct graph;
@@ -24,7 +25,7 @@ void graph_remove_dependency(
 		struct graph_node *dependent,
 		struct graph_node *dependency);
 int graph_has_cycle(const struct graph *graph);
-void graph_remove_unneeded_nodes(struct graph *graph);
+void graph_remove_unneeded_nodes(struct graph *graph, struct list *output);
 struct graph_node *graph_get_ready_node(struct graph *graph);
 
 struct graph_node *graph_node_init(const struct string *name);

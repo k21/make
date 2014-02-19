@@ -238,7 +238,7 @@ static void mark_needed_dfs(struct list *stack) {
 	}
 }
 
-void graph_remove_unneeded_nodes(struct graph *graph) {
+void graph_remove_unneeded_nodes(struct graph *graph, struct list *output) {
 	struct list_item *item;
 	struct list *stack;
 
@@ -274,6 +274,7 @@ void graph_remove_unneeded_nodes(struct graph *graph) {
 
 		if (!node->visit) {
 			graph_remove_node(graph, node);
+			list_push_back(output, node);
 		}
 	}
 }
