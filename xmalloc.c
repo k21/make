@@ -11,3 +11,13 @@ void *xmalloc(size_t size) {
 
 	return (result);
 }
+
+void *xrealloc(void *ptr, size_t size) {
+	void *result = realloc(ptr, size);
+	if (!result) {
+		fprintf(stderr, "Error: Out of memory\n");
+		abort();
+	}
+
+	return (result);
+}
