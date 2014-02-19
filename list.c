@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 
 #include "list.h"
@@ -35,7 +36,7 @@ void list_destroy(struct list *list) {
 	free(list);
 }
 
-void list_add(struct list *list, void *data) {
+void list_push_back(struct list *list, void *data) {
 	struct list_item *new_item;
 
 	new_item = xmalloc(sizeof (*new_item));
@@ -46,11 +47,37 @@ void list_add(struct list *list, void *data) {
 	if (list->tail) {
 		list->tail->next = new_item;
 		new_item->prev = list->tail;
-		list->tail = new_item;
 	} else {
 		list->head = new_item;
+	}
+	list->tail = new_item;
+}
+
+void list_push_front(struct list *list, void *data) {
+	struct list_item *new_item;
+
+	new_item = xmalloc(sizeof (*new_item));
+	new_item->next = NULL;
+	new_item->prev = NULL;
+	new_item->data = data;
+
+	if (list->head) {
+		list->head->prev = new_item;
+		new_item->next = list->head;
+	} else {
 		list->tail = new_item;
 	}
+	list->head = new_item;
+}
+
+void list_pop_back(struct list *list) {
+	assert(list->tail != NULL);
+	list_remove(list, list->tail);
+}
+
+void list_pop_front(struct list *list) {
+	assert(list->head != NULL);
+	list_remove(list, list->head);
 }
 
 void list_remove(struct list *list, struct list_item *item) {
