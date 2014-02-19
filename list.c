@@ -96,6 +96,10 @@ void list_remove(struct list *list, struct list_item *item) {
 	free(item);
 }
 
+int list_empty(const struct list *list) {
+	return (list->head == NULL);
+}
+
 struct list_item *list_head(struct list *list) {
 	return (list->head);
 }
