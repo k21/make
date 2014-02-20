@@ -4,6 +4,9 @@ HEADERS = buffer.h graph.h list.h string.h xmalloc.h
 make: $(OBJS)
 	gcc $(LDFLAGS) -o $@ $(OBJS)
 
+clean:
+	rm make $(OBJS)
+
 
 buffer.o: buffer.c $(HEADERS)
 	gcc -c -Wall -Wextra -Wconversion $(CFLAGS) -o $@ $<
