@@ -64,5 +64,5 @@ char buffer_getchar(struct buffer *buffer) {
 		load_data(buffer);
 	}
 
-	return c;
+	return (c);
 }
