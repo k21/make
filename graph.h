@@ -34,6 +34,9 @@ void graph_node_destroy(struct graph_node *node);
 const struct string *graph_node_get_name(const struct graph_node *node);
 void graph_node_set_time(struct graph_node *node, const struct timespec *time);
 void graph_node_mark_target(struct graph_node *node);
+void graph_node_add_command(
+		struct graph_node *node,
+		const struct string *command);
 int graph_node_needs_update(const struct graph_node *node);
 int graph_node_exists(const struct graph_node *node);
 

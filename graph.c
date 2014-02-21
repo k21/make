@@ -12,7 +12,7 @@ struct graph {
 
 struct graph_node {
 	struct string *name;
-	struct string *command;
+	struct list *commands;
 	struct list *dependencies;
 	struct list *dependents;
 	struct timespec time;
@@ -299,7 +299,8 @@ struct graph_node *graph_node_init(const struct string *name) {
 	struct graph_node *node = xmalloc(sizeof (*node));
 
 	node->name = string_init(string_get_cstr(name));
-	node->command = string_init("");
+
+	node->commands = list_init();
 
 	node->dependencies = list_init();
 	node->dependents = list_init();
@@ -316,8 +317,17 @@ struct graph_node *graph_node_init(const struct string *name) {
 }
 
 void graph_node_destroy(struct graph_node *node) {
+	struct list_item *item = list_head(node->commands);
+
+	while (item != NULL) {
+		struct string *command = list_get_data(item);
+		string_destroy(command);
+		item = list_next(item);
+	}
+
 	string_destroy(node->name);
-	string_destroy(node->command);
+
+	list_destroy(node->commands);
 
 	assert(list_empty(node->dependencies));
 	assert(list_empty(node->dependents));
@@ -340,6 +350,14 @@ void graph_node_set_time(struct graph_node *node, const struct timespec *time) {
 
 void graph_node_mark_target(struct graph_node *node) {
 	node->target = 1;
+}
+
+void graph_node_add_command(
+		struct graph_node *node,
+		const struct string *command) {
+	struct string *command_copy = string_init_copy(command);
+
+	list_push_back(node->commands, command_copy);
 }
 
 int graph_node_needs_update(const struct graph_node *node) {
