@@ -298,7 +298,7 @@ struct graph_node *graph_get_ready_node(struct graph *graph) {
 struct graph_node *graph_node_init(const struct string *name) {
 	struct graph_node *node = xmalloc(sizeof (*node));
 
-	node->name = string_init(string_get_cstr(name));
+	node->name = string_init_copy(name);
 
 	node->commands = list_init();
 
