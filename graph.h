@@ -39,5 +39,6 @@ void graph_node_add_command(
 		const struct string *command);
 int graph_node_needs_update(const struct graph_node *node);
 int graph_node_exists(const struct graph_node *node);
+struct list *graph_node_get_commands(const struct graph_node *node);
 
 #endif
