@@ -10,7 +10,7 @@
 
 static void syntax_error(const char *msg) {
 	fprintf(stderr, "Syntax error: %s\n", msg);
-	exit(1);
+	exit(2);
 }
 
 static int is_blank(char c) {
