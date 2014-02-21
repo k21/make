@@ -121,6 +121,22 @@ static void escape_line(struct string *input, struct string *output) {
 	}
 }
 
+static void escape_command(const struct string *input, struct string *output) {
+	const char *cstr = string_get_cstr(input);
+	size_t len = string_get_size(input);
+	size_t i;
+	int new_line = 1;
+
+	string_clear(output);
+
+	for (i = 0; i < len; ++i) {
+		if (!new_line || cstr[i] != '\t') {
+			string_append_char(output, cstr[i]);
+		}
+		new_line = (cstr[i] == '\n');
+	}
+}
+
 static void load_macro(const struct string *line, size_t at,
 		struct dict *macros) {
 	struct string *name;
@@ -302,13 +318,18 @@ static void add_command(
 		struct list *targets,
 		const struct string *command) {
 	struct list_item *item = list_head(targets);
+	struct string *escaped = string_init("");
+
+	escape_command(command, escaped);
 
 	while (item != NULL) {
 		struct string *node_name = list_get_data(item);
 		struct graph_node *node = get_or_add_node(graph, node_name);
-		graph_node_add_command(node, command);
+		graph_node_add_command(node, escaped);
 		item = list_next(item);
 	}
+
+	string_destroy(escaped);
 }
 
 static size_t load_macro_name(
