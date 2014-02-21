@@ -238,7 +238,7 @@ static void add_dependencies(
 
 static void load_rule(
 		const struct string *line,
-		const struct dict *macros,
+		struct dict *macros,
 		struct graph *graph,
 		struct list *targets_list) {
 	struct string *expanded = string_init("");
@@ -311,12 +311,61 @@ static void add_command(
 	}
 }
 
+static size_t load_macro_name(
+		const char *cstr,
+		size_t start,
+		char end_char,
+		struct string *output) {
+	size_t i = start;
+
+	while (cstr[i] && cstr[i] != end_char) {
+		string_append_char(output, cstr[i]);
+		++i;
+	}
+
+	if (!cstr[i]) {
+		syntax_error("Unclosed macro name");
+	}
+
+	return (i);
+}
+
 void expand_macros(
 		const struct string *line,
-		const struct dict *macros,
+		struct dict *macros,
 		struct string *output) {
-	// TODO: implement
-	string_set(output, line);
+	const char *cstr = string_get_cstr(line);
+	size_t size = string_get_size(line);
+	size_t i;
+	struct string *macro_name = string_init("");
+	const struct string *macro_value;
+
+	for (i = 0; i < size; ++i) {
+		if (cstr[i] != '$') {
+			string_append_char(output, cstr[i]);
+		} else {
+			++i;
+			if (i == size) {
+				syntax_error("Dollar sign at the end of a line");
+			}
+			if (cstr[i] == '(') {
+				i = load_macro_name(cstr, i + 1, ')', macro_name);
+			} else if (cstr[i] == '{') {
+				i = load_macro_name(cstr, i + 1, '}', macro_name);
+			} else {
+				string_append_char(macro_name, cstr[i]);
+			}
+
+			macro_value = dict_get(macros, macro_name);
+			if (macro_value != NULL) {
+				expand_macros(macro_value, macros, output);
+			}
+
+			string_clear(macro_name);
+		}
+	}
+
+	string_destroy(macro_name);
 }
 
 int parse_file(int fd, struct graph *output, struct dict *macros) {
