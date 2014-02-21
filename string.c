@@ -29,6 +29,20 @@ struct string *string_init(const char *cstr) {
 	return (string);
 }
 
+struct string *string_init_copy(const struct string *other) {
+	struct string *string = xmalloc(sizeof (*string));
+
+	size_t capacity = other->used;
+
+	string->used = capacity;
+	string->capacity = capacity;
+
+	string->data = xmalloc(capacity);
+	memcpy(string->data, other->data, capacity);
+
+	return (string);
+}
+
 void string_destroy(struct string *string) {
 	free(string->data);
 	free(string);
@@ -53,6 +67,11 @@ int string_equal(const struct string *s1, const struct string *s2) {
 void string_clear(struct string *string) {
 	string->data[0] = '\0';
 	string->used = 1;
+}
+
+void string_set(struct string *string, const struct string *other) {
+	string_clear(string);
+	string_append(string, other);
 }
 
 void string_reserve(struct string *string, size_t capacity) {

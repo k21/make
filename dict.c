@@ -54,15 +54,13 @@ void dict_set(struct dict *dict, struct string *key, struct string *value) {
 
 	if (pair == NULL) {
 		pair = xmalloc(sizeof (*pair));
-		pair->key = string_init("");
+		pair->key = string_init_copy(key);
 		pair->value = string_init("");
 
-		string_append(pair->key, key);
 		list_push_back(dict->pairs, pair);
 	}
 
-	string_clear(pair->value);
-	string_append(pair->value, value);
+	string_set(pair->value, value);
 }
 
 struct string *dict_get(struct dict *dict, struct string *key) {
