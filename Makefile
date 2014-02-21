@@ -1,5 +1,5 @@
-OBJS = buffer.o dict.o graph.o list.o main.o string.o xmalloc.o
-HEADERS = buffer.h dict.h graph.h list.h string.h xmalloc.h
+OBJS = buffer.o dict.o graph.o list.o main.o parse.o string.o xmalloc.o
+HEADERS = buffer.h dict.h graph.h list.h parse.h string.h xmalloc.h
 
 make: $(OBJS)
 	gcc $(LDFLAGS) -o $@ $(OBJS)
@@ -21,6 +21,9 @@ list.o: list.c $(HEADERS)
 	gcc -c -Wall -Wextra -Wconversion $(CFLAGS) -o $@ $<
 
 main.o: main.c $(HEADERS)
+	gcc -c -Wall -Wextra -Wconversion $(CFLAGS) -o $@ $<
+
+parse.o: parse.c $(HEADERS)
 	gcc -c -Wall -Wextra -Wconversion $(CFLAGS) -o $@ $<
 
 string.o: string.c $(HEADERS)

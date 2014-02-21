@@ -1,37 +1,34 @@
+#include <fcntl.h>
 #include <stdio.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
+#include "dict.h"
 #include "graph.h"
 #include "list.h"
-
-static struct graph_node *add_node(struct graph *graph, char *name) {
-	struct string *name_str;
-	struct graph_node *node;
-
-	name_str = string_init(name);
-	node = graph_node_init(name_str);
-	graph_add_node(graph, node);
-	string_destroy(name_str);
-
-	return (node);
-}
+#include "parse.h"
 
 int main() {
 	struct graph *graph = graph_init();
 	struct graph_node *node;
 
-	struct graph_node *a = add_node(graph, "a");
-	struct graph_node *b = add_node(graph, "b");
-	struct graph_node *c = add_node(graph, "c");
-	struct graph_node *d = add_node(graph, "d");
+	struct dict *macros = dict_init();
 
-	graph_add_dependency(graph, a, b);
-	graph_add_dependency(graph, a, c);
-	graph_add_dependency(graph, b, d);
-	graph_add_dependency(graph, c, d);
+	int fd = open("Makefile", O_RDONLY);
+
+	parse_file(fd, graph, macros);
+
+	close(fd);
 
 	printf("%s\n", graph_has_cycle(graph) ? "Cycle" : "No Cycle");
 
-	graph_node_mark_target(a);
+	{
+		struct string *node_name = string_init("make");
+		node = graph_get_node_by_name(graph, node_name);
+		string_destroy(node_name);
+
+		graph_node_mark_target(node);
+	}
 
 	{
 		struct list *unneeded = list_init();
@@ -45,6 +42,8 @@ int main() {
 		}
 		list_destroy(unneeded);
 	}
+
+	dict_destroy(macros);
 
 	node = graph_get_ready_node(graph);
 	while (node != NULL) {
