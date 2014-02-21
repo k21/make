@@ -50,6 +50,11 @@ int string_equal(const struct string *s1, const struct string *s2) {
 	return (memcpy(s1->data, s2->data, s1->used) == 0);
 }
 
+void string_clear(struct string *string) {
+	string->data[0] = '\0';
+	string->used = 1;
+}
+
 void string_reserve(struct string *string, size_t capacity) {
 	++capacity;
 
