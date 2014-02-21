@@ -43,8 +43,6 @@ int main() {
 		list_destroy(unneeded);
 	}
 
-	dict_destroy(macros);
-
 	node = graph_get_ready_node(graph);
 	while (node != NULL) {
 		struct list *commands = graph_node_get_commands(node);
@@ -53,8 +51,13 @@ int main() {
 		printf("Build %s\n", string_get_cstr(graph_node_get_name(node)));
 		while (item != NULL) {
 			struct string *command = list_get_data(item);
-			printf("%s\n", string_get_cstr(command));
+			struct string *expanded = string_init("");
+
+			expand_macros(command, macros, expanded);
+			printf("%s\n", string_get_cstr(expanded));
 			item = list_next(item);
+
+			string_destroy(expanded);
 		}
 
 		graph_remove_node(graph, node);
@@ -62,6 +65,7 @@ int main() {
 		node = graph_get_ready_node(graph);
 	}
 
+	dict_destroy(macros);
 	graph_destroy(graph);
 
 	return (0);
