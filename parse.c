@@ -388,11 +388,12 @@ int parse_file(int fd, struct graph *output, struct dict *macros) {
 			stop = !load_line(buffer, line);
 			while (!stop) {
 				const char *line_cstr = string_get_cstr(line);
-				if (string_get_size(line) != 0 &&
-						line_cstr[0] != '\t') {
-					break;
+				if (string_get_size(line) != 0) {
+					if (line_cstr[0] != '\t') {
+						break;
+					}
+					add_command(output, targets, line);
 				}
-				add_command(output, targets, line);
 				stop = !load_line(buffer, line);
 			}
 			destroy_strings_in_list(targets);
