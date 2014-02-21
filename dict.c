@@ -17,7 +17,7 @@ struct dict *dict_init() {
 
 	dict->pairs = list_init();
 
-	return dict;
+	return (dict);
 }
 
 void dict_destroy(struct dict *dict) {
