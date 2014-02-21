@@ -1,6 +1,8 @@
 #ifndef	STRING_H_
 #define	STRING_H_
 
+#include <stddef.h>
+
 struct string;
 
 struct string *string_init(const char *cstr);
