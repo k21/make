@@ -47,7 +47,16 @@ int main() {
 
 	node = graph_get_ready_node(graph);
 	while (node != NULL) {
+		struct list *commands = graph_node_get_commands(node);
+		struct list_item *item = list_head(commands);
+
 		printf("Build %s\n", string_get_cstr(graph_node_get_name(node)));
+		while (item != NULL) {
+			struct string *command = list_get_data(item);
+			printf("%s\n", string_get_cstr(command));
+			item = list_next(item);
+		}
+
 		graph_remove_node(graph, node);
 		graph_node_destroy(node);
 		node = graph_get_ready_node(graph);
