@@ -147,7 +147,7 @@ static int detect_cycle_dfs(struct list *stack) {
 		node = list_front(stack);
 
 		if (node->visit == 0) {
-			// entering node
+			/* entering node */
 			node->visit = 1;
 
 			item = list_head(node->dependencies);
@@ -167,7 +167,7 @@ static int detect_cycle_dfs(struct list *stack) {
 				item = list_next(item);
 			}
 		} else {
-			// leaving node
+			/* leaving node */
 			assert(node->visit == 1 || node->visit == 2);
 			node->visit = 2;
 

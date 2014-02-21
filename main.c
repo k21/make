@@ -32,8 +32,11 @@ int main() {
 
 	{
 		struct list *unneeded = list_init();
+		struct list_item *item;
+
 		graph_remove_unneeded_nodes(graph, unneeded);
-		struct list_item *item = list_head(unneeded);
+
+		item = list_head(unneeded);
 		while (item) {
 			struct graph_node *node = list_get_data(item);
 			printf("Unneeded %s\n", string_get_cstr(graph_node_get_name(node)));
