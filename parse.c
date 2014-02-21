@@ -367,12 +367,15 @@ void expand_macros(
 		} else {
 			++i;
 			if (i == size) {
-				syntax_error("Dollar sign at the end of a line");
+				syntax_error("Dollar sign "
+						"at the end of a line");
 			}
 			if (cstr[i] == '(') {
-				i = load_macro_name(cstr, i + 1, ')', macro_name);
+				i = load_macro_name(cstr,
+						i + 1, ')', macro_name);
 			} else if (cstr[i] == '{') {
-				i = load_macro_name(cstr, i + 1, '}', macro_name);
+				i = load_macro_name(cstr,
+						i + 1, '}', macro_name);
 			} else {
 				string_append_char(macro_name, cstr[i]);
 			}
