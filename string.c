@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -39,6 +40,23 @@ struct string *string_init_copy(const struct string *other) {
 
 	string->data = xmalloc(capacity);
 	memcpy(string->data, other->data, capacity);
+
+	return (string);
+}
+
+struct string *string_init_substring(
+		const struct string *other,
+		size_t begin, size_t length) {
+	struct string *string = xmalloc(sizeof (*string));
+
+	assert(begin + length <= other->used - 1);
+
+	string->used = length + 1;
+	string->capacity = length + 1;
+
+	string->data = xmalloc(length + 1);
+	memcpy(string->data, other->data + begin, length);
+	string->data[length] = '\0';
 
 	return (string);
 }
