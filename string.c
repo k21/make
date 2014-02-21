@@ -47,7 +47,7 @@ int string_equal(const struct string *s1, const struct string *s2) {
 		return (0);
 	}
 
-	return (memcpy(s1->data, s2->data, s1->used) == 0);
+	return (memcmp(s1->data, s2->data, s1->used) == 0);
 }
 
 void string_clear(struct string *string) {
@@ -77,6 +77,7 @@ void string_append(struct string *string, const struct string *other) {
 	}
 
 	memcpy(string->data + string->used - 1, other->data, other->used);
+	string->used = needed;
 }
 
 void string_append_cstr(struct string *string, const char *cstr) {
