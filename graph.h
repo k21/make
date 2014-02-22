@@ -3,12 +3,11 @@
 
 #include <time.h>
 
-#include "string.h"
-
 struct graph;
 struct graph_node;
 
 struct list;
+struct string;
 
 struct graph *graph_init();
 void graph_destroy(struct graph *graph);

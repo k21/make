@@ -8,6 +8,7 @@
 #include "list.h"
 #include "macros.h"
 #include "parse.h"
+#include "string.h"
 
 int main() {
 	struct graph *graph = graph_init();
