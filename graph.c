@@ -16,6 +16,7 @@ struct graph_node {
 	struct list *commands;
 	struct list *dependencies;
 	struct list *dependents;
+	struct list *repeated_dependencies;
 	struct timespec time;
 	int target;
 	int visit;
@@ -87,6 +88,8 @@ void graph_add_dependency(
 		struct graph *graph,
 		struct graph_node *dependent,
 		struct graph_node *dependency) {
+	list_push_back(dependent->repeated_dependencies, dependency);
+
 	if (list_find(dependent->dependencies, dependency) != NULL) {
 		return;
 	}
@@ -228,6 +231,8 @@ struct graph_node *graph_node_init(const struct string *name) {
 	node->dependencies = list_init();
 	node->dependents = list_init();
 
+	node->repeated_dependencies = list_init();
+
 	node->time.tv_sec = 0;
 	node->time.tv_nsec = 0;
 
@@ -257,6 +262,8 @@ void graph_node_destroy(struct graph_node *node) {
 
 	list_destroy(node->dependencies);
 	list_destroy(node->dependents);
+
+	list_destroy(node->repeated_dependencies);
 
 	free(node);
 }
@@ -324,4 +331,9 @@ struct list *graph_node_get_commands(const struct graph_node *node) {
 
 struct list *graph_node_get_dependencies(const struct graph_node *node) {
 	return (node->dependencies);
+}
+
+struct list *graph_node_get_repeated_dependencies(
+		const struct graph_node *node) {
+	return (node->repeated_dependencies);
 }

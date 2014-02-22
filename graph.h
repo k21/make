@@ -36,6 +36,8 @@ int graph_node_needs_update(const struct graph_node *node);
 int graph_node_exists(const struct graph_node *node);
 struct list *graph_node_get_commands(const struct graph_node *node);
 struct list *graph_node_get_dependencies(const struct graph_node *node);
+struct list *graph_node_get_repeated_dependencies(
+		const struct graph_node *node);
 int graph_node_is_newer(
 		const struct graph_node *n1,
 		const struct graph_node *n2);

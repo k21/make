@@ -143,5 +143,24 @@ void populate_automatic_macros(struct graph_node *node, struct dict *macros) {
 	sets(macros, "?", newer);
 
 	string_destroy(newer);
+
+	string_clear(all);
+
+	item = list_head(graph_node_get_repeated_dependencies(node));
+	while (item != NULL) {
+		struct graph_node *dependency = list_get_data(item);
+		const struct string *dependency_name;
+
+		dependency_name = graph_node_get_name(dependency);
+
+		if (string_get_size(all) != 0) {
+			string_append_char(all, ' ');
+		}
+		string_append(all, dependency_name);
+
+		item = list_next(item);
+	}
+	sets(macros, "+", all);
+
 	string_destroy(all);
 }
