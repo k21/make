@@ -36,7 +36,7 @@ int main() {
 
 	update_all_files_info(graph);
 	graph_process(graph);
-	ret = run_jobs(graph, macros);
+	ret = run_jobs(graph, macros, 1);
 
 	dict_destroy(macros);
 	graph_destroy(graph);

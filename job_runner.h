@@ -4,6 +4,6 @@
 struct graph;
 struct dict;
 
-int run_jobs(struct graph *graph, struct dict *macros);
+int run_jobs(struct graph *graph, struct dict *macros, int max_jobs);
 
 #endif
