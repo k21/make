@@ -11,6 +11,11 @@ static void *check_not_null(void *ptr) {
 	return (ptr);
 }
 
+void *xcalloc(size_t n, size_t size) {
+	void *result = calloc(n, size);
+	return (check_not_null(result));
+}
+
 void *xmalloc(size_t size) {
 	void *result = malloc(size);
 	return (check_not_null(result));
