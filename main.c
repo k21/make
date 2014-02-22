@@ -24,8 +24,6 @@ int main() {
 
 	close(fd);
 
-	printf("%s\n", graph_has_cycle(graph) ? "Cycle" : "No Cycle");
-
 	{
 		struct string *node_name = string_init("make");
 		node = graph_get_node_by_name(graph, node_name);
@@ -34,21 +32,7 @@ int main() {
 		graph_node_mark_target(node);
 	}
 
-	{
-		struct list *unneeded = list_init();
-		struct list_item *item;
-
-		graph_remove_unneeded_nodes(graph, unneeded);
-
-		item = list_head(unneeded);
-		while (item) {
-			struct graph_node *node = list_get_data(item);
-			printf("Unneeded %s\n", string_get_cstr(graph_node_get_name(node)));
-			graph_node_destroy(node);
-			item = list_next(item);
-		}
-		list_destroy(unneeded);
-	}
+	graph_process(graph);
 
 	node = graph_get_ready_node(graph);
 	while (node != NULL) {
@@ -68,8 +52,7 @@ int main() {
 			string_destroy(expanded);
 		}
 
-		graph_remove_node(graph, node);
-		graph_node_destroy(node);
+		graph_node_mark_resolved(graph, node);
 		node = graph_get_ready_node(graph);
 	}
 
