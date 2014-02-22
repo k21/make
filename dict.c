@@ -35,7 +35,9 @@ void dict_destroy(struct dict *dict) {
 	free(dict);
 }
 
-static struct dict_pair *dict_find(struct dict *dict, struct string *key) {
+static struct dict_pair *dict_find(
+		struct dict *dict,
+		const struct string *key) {
 	struct list_item *item = list_head(dict->pairs);
 
 	while (item != NULL) {
@@ -49,7 +51,10 @@ static struct dict_pair *dict_find(struct dict *dict, struct string *key) {
 	return (NULL);
 }
 
-void dict_set(struct dict *dict, struct string *key, struct string *value) {
+void dict_set(
+		struct dict *dict,
+		const struct string *key,
+		const struct string *value) {
 	struct dict_pair *pair = dict_find(dict, key);
 
 	if (pair == NULL) {
@@ -63,7 +68,9 @@ void dict_set(struct dict *dict, struct string *key, struct string *value) {
 	string_set(pair->value, value);
 }
 
-struct string *dict_get(struct dict *dict, struct string *key) {
+struct string *dict_get(
+		struct dict *dict,
+		const struct string *key) {
 	struct dict_pair *pair = dict_find(dict, key);
 
 	if (pair == NULL) {
