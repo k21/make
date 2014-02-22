@@ -49,6 +49,9 @@ void expand_macros(
 			} else if (cstr[i] == '{') {
 				i = load_macro_name(cstr,
 						i + 1, '}', macro_name);
+			} else if (cstr[i] == '$') {
+				string_append_char(output, '$');
+				continue;
 			} else {
 				string_append_char(macro_name, cstr[i]);
 			}
