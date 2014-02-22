@@ -69,3 +69,32 @@ void expand_macros(
 
 	string_destroy(macro_name);
 }
+
+static void set(struct dict *dict, const char *key, const char *value) {
+	struct string *key_string = string_init(key);
+	struct string *value_string = string_init(value);
+
+	dict_set(dict, key_string, value_string);
+
+	string_destroy(value_string);
+	string_destroy(key_string);
+}
+
+void populate_builtin_macros(struct dict *macros) {
+	set(macros, "MAKE", "make");
+	set(macros, "AR", "ar");
+	set(macros, "ARFLAGS", "-rv");
+	set(macros, "YACC", "yacc");
+	set(macros, "YFLAGS", "");
+	set(macros, "LEX", "lex");
+	set(macros, "LFLAGS", "");
+	set(macros, "LDFLAGS", "");
+	set(macros, "CC", "c99");
+	set(macros, "CFLAGS", "-O");
+	set(macros, "FC", "fort77");
+	set(macros, "FFLAGS", "-O 1");
+	set(macros, "GET", "get");
+	set(macros, "GFLAGS", "");
+	set(macros, "SCCSFLAGS", "");
+	set(macros, "SCCSGETFLAGS", "-s");
+}

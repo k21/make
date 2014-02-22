@@ -12,10 +12,13 @@
 int main() {
 	struct graph *graph = graph_init();
 	struct graph_node *node;
+	int fd;
 
 	struct dict *macros = dict_init();
 
-	int fd = open("Makefile", O_RDONLY);
+	populate_builtin_macros(macros);
+
+	fd = open("Makefile", O_RDONLY);
 
 	parse_file(fd, graph, macros);
 

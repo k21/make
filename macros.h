@@ -9,4 +9,6 @@ void expand_macros(
 		struct dict *macros,
 		struct string *output);
 
+void populate_builtin_macros(struct dict *macros);
+
 #endif
