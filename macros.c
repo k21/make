@@ -1,6 +1,7 @@
 #include "dict.h"
 #include "error.h"
 #include "graph.h"
+#include "list.h"
 #include "macros.h"
 #include "string.h"
 
@@ -97,5 +98,15 @@ void populate_builtin_macros(struct dict *macros) {
 }
 
 void populate_automatic_macros(struct graph_node *node, struct dict *macros) {
+	struct list_item *item;
+
 	sets(macros, "@", graph_node_get_name(node));
+
+	item = list_head(graph_node_get_dependencies(node));
+	if (item == NULL) {
+		set(macros, "<", "");
+	} else {
+		struct graph_node *dependency = list_get_data(item);
+		sets(macros, "<", graph_node_get_name(dependency));
+	}
 }
