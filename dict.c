@@ -1,3 +1,5 @@
+#define	_POSIX_C_SOURCE	200809L
+
 #include "dict.h"
 #include "list.h"
 #include "string.h"
