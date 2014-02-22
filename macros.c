@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "dict.h"
+#include "graph.h"
 #include "macros.h"
 #include "string.h"
 
@@ -70,14 +71,17 @@ void expand_macros(
 	string_destroy(macro_name);
 }
 
-static void set(struct dict *dict, const char *key, const char *value) {
+static void sets(struct dict *dict,
+		const char *key, const struct string *value_string) {
 	struct string *key_string = string_init(key);
-	struct string *value_string = string_init(value);
-
 	dict_set(dict, key_string, value_string);
-
-	string_destroy(value_string);
 	string_destroy(key_string);
+}
+
+static void set(struct dict *dict, const char *key, const char *value) {
+	struct string *value_string = string_init(value);
+	sets(dict, key, value_string);
+	string_destroy(value_string);
 }
 
 void populate_builtin_macros(struct dict *macros) {
@@ -97,4 +101,8 @@ void populate_builtin_macros(struct dict *macros) {
 	set(macros, "GFLAGS", "");
 	set(macros, "SCCSFLAGS", "");
 	set(macros, "SCCSGETFLAGS", "-s");
+}
+
+void populate_automatic_macros(struct graph_node *node, struct dict *macros) {
+	sets(macros, "@", graph_node_get_name(node));
 }

@@ -56,6 +56,7 @@ int main() {
 		struct list_item *item = list_head(commands);
 
 		printf("Build %s\n", string_get_cstr(graph_node_get_name(node)));
+		populate_automatic_macros(node, macros);
 		while (item != NULL) {
 			struct string *command = list_get_data(item);
 			struct string *expanded = string_init("");
