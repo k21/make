@@ -12,6 +12,7 @@ struct string;
 struct graph *graph_init();
 void graph_destroy(struct graph *graph);
 
+struct list *graph_get_nodes(struct graph *graph);
 struct graph_node *graph_get_node_by_name(
 		struct graph *graph,
 		const struct string *name);

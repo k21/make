@@ -54,6 +54,10 @@ void graph_add_node(struct graph *graph, struct graph_node *node) {
 	list_push_back(graph->ready_nodes, node);
 }
 
+struct list *graph_get_nodes(struct graph *graph) {
+	return (graph->nodes);
+}
+
 struct graph_node *graph_get_node_by_name(
 		struct graph *graph,
 		const struct string *name) {

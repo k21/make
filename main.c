@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include "dict.h"
+#include "files.h"
 #include "graph.h"
 #include "list.h"
 #include "macros.h"
@@ -33,12 +34,22 @@ int main() {
 		graph_node_mark_target(node);
 	}
 
+	update_all_files_info(graph);
+
 	graph_process(graph);
 
 	node = graph_get_ready_node(graph);
 	while (node != NULL) {
 		struct list *commands = graph_node_get_commands(node);
 		struct list_item *item = list_head(commands);
+
+		if (!graph_node_needs_update(node)) {
+			printf("Up to date: %s\n",
+					string_get_cstr(graph_node_get_name(node)));
+			graph_node_mark_resolved(graph, node);
+			node = graph_get_ready_node(graph);
+			continue;
+		}
 
 		printf("Build %s\n", string_get_cstr(graph_node_get_name(node)));
 		populate_automatic_macros(node, macros);
