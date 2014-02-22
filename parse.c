@@ -326,7 +326,7 @@ static void add_command(
 	string_destroy(escaped);
 }
 
-int parse_file(int fd, struct graph *output, struct dict *macros) {
+void parse_file(int fd, struct graph *output, struct dict *macros) {
 	struct buffer *buffer = buffer_init(fd);
 	struct string *line = string_init("");
 	struct string *escaped_line = string_init("");
@@ -359,10 +359,12 @@ int parse_file(int fd, struct graph *output, struct dict *macros) {
 		}
 	}
 
+	if (buffer_error(buffer)) {
+		fatal_error("Error reading the makefile");
+	}
+
 	list_destroy(targets);
 	string_destroy(escaped_line);
 	string_destroy(line);
 	buffer_destroy(buffer);
-
-	return (0);
 }

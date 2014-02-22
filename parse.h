@@ -4,6 +4,6 @@
 struct graph;
 struct dict;
 
-int parse_file(int fd, struct graph *output, struct dict *macros);
+void parse_file(int fd, struct graph *output, struct dict *macros);
 
 #endif
