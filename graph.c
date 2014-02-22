@@ -217,13 +217,18 @@ void graph_process(struct graph *graph) {
 
 struct graph_node *graph_get_ready_node(struct graph *graph) {
 	struct list_item *item;
+	struct graph_node *node;
 
 	item = list_head(graph->ready_nodes);
 	if (item == NULL) {
 		return (NULL);
 	}
 
-	return (list_get_data(item));
+	node = list_get_data(item);
+
+	list_remove(graph->ready_nodes, item);
+
+	return (node);
 }
 
 
