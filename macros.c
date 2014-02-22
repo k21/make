@@ -1,15 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "dict.h"
+#include "error.h"
 #include "graph.h"
 #include "macros.h"
 #include "string.h"
-
-static void syntax_error(const char *msg) {
-	fprintf(stderr, "Syntax error: %s\n", msg);
-	exit(2);
-}
 
 static size_t load_macro_name(
 		const char *cstr,
@@ -24,7 +17,7 @@ static size_t load_macro_name(
 	}
 
 	if (!cstr[i]) {
-		syntax_error("Unclosed macro name");
+		fatal_error("Unclosed macro name");
 	}
 
 	return (i);
@@ -46,7 +39,7 @@ void expand_macros(
 		} else {
 			++i;
 			if (i == size) {
-				syntax_error("Dollar sign "
+				fatal_error("Dollar sign "
 						"at the end of a line");
 			}
 			if (cstr[i] == '(') {

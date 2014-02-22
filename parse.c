@@ -1,18 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "buffer.h"
 #include "dict.h"
+#include "error.h"
 #include "graph.h"
 #include "list.h"
 #include "macros.h"
 #include "parse.h"
 #include "string.h"
-
-static void syntax_error(const char *msg) {
-	fprintf(stderr, "Syntax error: %s\n", msg);
-	exit(2);
-}
 
 static int is_blank(char c) {
 	return (c == ' ' || c == '\t');
@@ -155,7 +148,7 @@ static void load_macro(const struct string *line, size_t at,
 	name_end = nonblank_end(line_cstr, name_begin, name_end);
 
 	if (name_begin == name_end) {
-		syntax_error("Empty macro name");
+		fatal_error("Empty macro name");
 	}
 
 	name = string_init_substring(line,
@@ -290,7 +283,7 @@ static void load_rule(
 		struct list *dependencies_list;
 
 		if (expanded_cstr[at] != ':') {
-			syntax_error("Separator not found");
+			fatal_error("Separator not found");
 		}
 
 		targets = string_init_substring(expanded, 0, at);
