@@ -1,5 +1,5 @@
-OBJS = buffer.o dict.o graph.o list.o main.o parse.o string.o xmalloc.o
-HEADERS = buffer.h dict.h graph.h list.h parse.h string.h xmalloc.h
+OBJS = buffer.o dict.o graph.o list.o macros.o main.o parse.o string.o xmalloc.o
+HEADERS = buffer.h dict.h graph.h list.h macros.h parse.h string.h xmalloc.h
 
 COMPILE_CMD = $(CC) -c $(CFLAGS) -o $@ $<
 
@@ -20,6 +20,9 @@ graph.o: graph.c $(HEADERS)
 	$(COMPILE_CMD)
 
 list.o: list.c $(HEADERS)
+	$(COMPILE_CMD)
+
+macros.o: macros.c $(HEADERS)
 	$(COMPILE_CMD)
 
 main.o: main.c $(HEADERS)

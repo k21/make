@@ -6,6 +6,7 @@
 #include "dict.h"
 #include "graph.h"
 #include "list.h"
+#include "macros.h"
 #include "parse.h"
 
 int main() {
