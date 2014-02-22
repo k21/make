@@ -32,6 +32,7 @@ struct graph_node *graph_get_ready_node(struct graph *graph);
 struct graph_node *graph_node_init(const struct string *name);
 void graph_node_destroy(struct graph_node *node);
 const struct string *graph_node_get_name(const struct graph_node *node);
+struct list *graph_node_get_dependencies(const struct graph_node *node);
 void graph_node_set_time(struct graph_node *node, const struct timespec *time);
 void graph_node_mark_target(struct graph_node *node);
 void graph_node_add_command(
