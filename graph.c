@@ -17,7 +17,7 @@ struct graph_node {
 	struct list *dependencies;
 	struct list *dependents;
 	struct list *repeated_dependencies;
-	struct timespec time;
+	struct my_timespec time;
 	int target;
 	int visit;
 	int needs_update;
@@ -81,11 +81,11 @@ int graph_node_is_newer(
 		return (1);
 	}
 
-	if (n1->time.tv_sec != n2->time.tv_sec) {
-		return (n1->time.tv_sec > n2->time.tv_sec);
+	if (n1->time.sec != n2->time.sec) {
+		return (n1->time.sec > n2->time.sec);
 	}
 
-	return (n1->time.tv_nsec > n2->time.tv_nsec);
+	return (n1->time.nsec > n2->time.nsec);
 }
 
 void graph_add_dependency(
@@ -242,8 +242,8 @@ struct graph_node *graph_node_init(const struct string *name) {
 
 	node->repeated_dependencies = list_init();
 
-	node->time.tv_sec = 0;
-	node->time.tv_nsec = 0;
+	node->time.sec = 0;
+	node->time.nsec = 0;
 
 	node->target = 0;
 	node->visit = 0;
@@ -281,9 +281,11 @@ const struct string *graph_node_get_name(const struct graph_node *node) {
 	return (node->name);
 }
 
-void graph_node_set_time(struct graph_node *node, const struct timespec *time) {
-	node->time.tv_sec  = time->tv_sec;
-	node->time.tv_nsec = time->tv_nsec;
+void graph_node_set_time(
+		struct graph_node *node,
+		const struct my_timespec *time) {
+	node->time.sec  = time->sec;
+	node->time.nsec = time->nsec;
 	node->exists = 1;
 }
 

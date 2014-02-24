@@ -7,6 +7,11 @@
 #include "list.h"
 #include "string.h"
 
+static void extract_mtime(const struct stat *stat, struct my_timespec *ts) {
+	ts->sec = stat->st_mtim.tv_sec;
+	ts->nsec = stat->st_mtim.tv_nsec;
+}
+
 void update_file_info(struct graph_node *node) {
 	const struct string *name = graph_node_get_name(node);
 	const char *name_cstr = string_get_cstr(name);
@@ -15,7 +20,10 @@ void update_file_info(struct graph_node *node) {
 
 	ret = stat(name_cstr, &stat_buf);
 	if (ret == 0) {
-		graph_node_set_time(node, &stat_buf.st_mtim);
+		struct my_timespec ts;
+
+		extract_mtime(&stat_buf, &ts);
+		graph_node_set_time(node, &ts);
 	} else if (errno != ENOENT && errno != ENOTDIR) {
 		fatal_error("Could not stat a file");
 	}

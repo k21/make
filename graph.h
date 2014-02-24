@@ -6,6 +6,11 @@
 struct graph;
 struct graph_node;
 
+struct my_timespec {
+	time_t sec;
+	long nsec;
+};
+
 struct list;
 struct string;
 
@@ -42,7 +47,9 @@ int graph_node_is_newer(
 		const struct graph_node *n1,
 		const struct graph_node *n2);
 
-void graph_node_set_time(struct graph_node *node, const struct timespec *time);
+void graph_node_set_time(
+		struct graph_node *node,
+		const struct my_timespec *time);
 void graph_node_mark_target(struct graph_node *node);
 void graph_node_mark_resolved(struct graph *graph, struct graph_node *node);
 void graph_node_add_command(
