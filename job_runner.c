@@ -41,7 +41,7 @@ static pid_t start_job(
 	if (pid < 0) {
 		fatal_error("fork call failed");
 	} else if (pid == 0) {
-		execl("/bin/sh", "sh", "-e", "-c", cstr, NULL);
+		execl("/bin/sh", "sh", "-ce", cstr, NULL);
 		fatal_error("exec call failed");
 	}
 
