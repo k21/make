@@ -7,9 +7,19 @@
 #include "list.h"
 #include "string.h"
 
+
+#ifndef	STAT_MTIME_SEC
+#define	STAT_MTIME_SEC	st_mtime
+#endif
+
+
 static void extract_mtime(const struct stat *stat, struct my_timespec *ts) {
-	ts->sec = stat->st_mtim.tv_sec;
-	ts->nsec = stat->st_mtim.tv_nsec;
+	ts->sec = stat->STAT_MTIME_SEC;
+#ifdef	STAT_MTIME_NSEC
+	ts->nsec = stat->STAT_MTIME_NSEC;
+#else
+	ts->nsec = 0;
+#endif
 }
 
 void update_file_info(struct graph_node *node) {
