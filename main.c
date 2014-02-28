@@ -1,43 +1,134 @@
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
 #include "dict.h"
+#include "error.h"
 #include "files.h"
 #include "graph.h"
 #include "job_runner.h"
+#include "list.h"
 #include "macros.h"
 #include "parse.h"
 #include "string.h"
 
-int main() {
-	struct graph *graph = graph_init();
-	struct graph_node *node;
-	int fd;
-	int ret;
-	struct dict *macros = dict_init();
+static void print_usage() {
+	fprintf(stderr, "Usage: "
+			"make [-C dir]... [-f makefile] "
+			"[-j jobs] [target]...\n");
+}
 
-	populate_builtin_macros(macros);
+int main(int argc, char **argv) {
+	int c;
+	const char *makefile = NULL;
+	long jobs = 1;
+	char *endptr;
 
-	fd = open("Makefile", O_RDONLY);
-	parse_file(fd, graph, macros);
-	close(fd);
+	while ((c = getopt(argc, argv, "C:f:j:")) != -1) {
+		switch (c) {
+			case 'C':
+				if (chdir(optarg)) {
+					fprintf(stderr,
+							"Could not change "
+							"directory to %s\n",
+							optarg);
+					return (2);
+				}
+				break;
 
-	{
-		struct string *node_name = string_init("make");
-		node = graph_get_node_by_name(graph, node_name);
-		string_destroy(node_name);
+			case 'f':
+				if (makefile != NULL) {
+					fprintf(stderr, "Option -f specified "
+							"multiple times\n");
+					return (2);
+				}
+				makefile = optarg;
+				break;
 
-		graph_node_mark_target(node);
+			case 'j':
+				errno = 0;
+				jobs = strtol(optarg, &endptr, 10);
+				if (errno != 0 || jobs < 1 || *endptr != '\0') {
+					fprintf(stderr, "Invalid numeric value "
+							"for option -j\n");
+					return (2);
+				}
+				break;
+
+			default:
+				print_usage();
+				return (2);
+		}
 	}
 
-	update_all_files_info(graph);
-	graph_process(graph);
-	ret = run_jobs(graph, macros, 1);
+	if (makefile == NULL) {
+		makefile = "Makefile";
+	}
 
-	dict_destroy(macros);
-	graph_destroy(graph);
+	{
+		struct graph *graph = graph_init();
+		struct dict *macros = dict_init();
+		int fd;
 
-	return (ret);
+		populate_builtin_macros(macros);
+
+		fd = open(makefile, O_RDONLY);
+		if (fd < 0) {
+			fprintf(stderr, "Could not open the makefile\n");
+			return (2);
+		}
+		parse_file(fd, graph, macros);
+		close(fd);
+
+		if (optind == argc) {
+			/* No targets specified, use the first target */
+			struct list *nodes;
+			struct list_item *item;
+			struct graph_node *node;
+
+			nodes = graph_get_nodes(graph);
+			item = list_head(nodes);
+			if (item == NULL) {
+				fprintf(stderr, "No target specified\n");
+				return (2);
+			}
+			node = list_get_data(item);
+			graph_node_mark_target(node);
+		} else {
+			/* Read the list of targets from the command line */
+			int i;
+
+			for (i = optind; i < argc; ++i) {
+				struct string *node_name;
+				struct graph_node *node;
+
+				node_name = string_init(argv[i]);
+				node = graph_get_node_by_name(graph, node_name);
+				string_destroy(node_name);
+
+				if (node == NULL) {
+					fprintf(stderr, "Unknown target %s\n",
+							argv[i]);
+					return (2);
+				}
+
+				graph_node_mark_target(node);
+			}
+		}
+
+		update_all_files_info(graph);
+		graph_process(graph);
+
+		{
+			int ret = run_jobs(graph, macros, (size_t)jobs);
+
+			dict_destroy(macros);
+			graph_destroy(graph);
+
+			return (ret);
+		}
+	}
 }
