@@ -12,9 +12,13 @@ struct string {
 };
 
 struct string *string_init(const char *cstr) {
-	struct string *string = xmalloc(sizeof (*string));
-
 	size_t size = strlen(cstr);
+
+	return (string_init_data(cstr, size));
+}
+
+struct string *string_init_data(const char *data, size_t size) {
+	struct string *string = xmalloc(sizeof (*string));
 	size_t capacity = size + 1;
 
 	if (capacity < 16) {
@@ -25,7 +29,8 @@ struct string *string_init(const char *cstr) {
 	string->capacity = capacity;
 
 	string->data = xmalloc(capacity);
-	memcpy(string->data, cstr, size + 1);
+	memcpy(string->data, data, size);
+	string->data[size] = '\0';
 
 	return (string);
 }

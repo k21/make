@@ -6,6 +6,7 @@
 struct string;
 
 struct string *string_init(const char *cstr);
+struct string *string_init_data(const char *data, size_t size);
 struct string *string_init_copy(const struct string *other);
 struct string *string_init_substring(
 		const struct string *other,
