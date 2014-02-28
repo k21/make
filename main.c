@@ -74,6 +74,7 @@ int main(int argc, char **argv) {
 		int fd;
 
 		populate_builtin_macros(macros);
+		populate_environment_variables(macros);
 
 		fd = open(makefile, O_RDONLY);
 		if (fd < 0) {

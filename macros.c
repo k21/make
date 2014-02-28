@@ -1,3 +1,6 @@
+#include <unistd.h>
+#include <string.h>
+
 #include "dict.h"
 #include "error.h"
 #include "graph.h"
@@ -98,6 +101,38 @@ void populate_builtin_macros(struct dict *macros) {
 	set(macros, "GFLAGS", "");
 	set(macros, "SCCSFLAGS", "");
 	set(macros, "SCCSGETFLAGS", "-s");
+}
+
+static void add_variable_from_environment(
+		struct dict *macros,
+		const char *str) {
+
+	const char *at = strchr(str, '=');
+	struct string *name;
+	struct string *value;
+
+	if (at == NULL) {
+		fatal_error("Environment variable without '='");
+	}
+
+	name = string_init_data(str, (size_t)(at - str));
+	value = string_init(at + 1);
+
+	dict_set(macros, name, value);
+
+	string_destroy(value);
+	string_destroy(name);
+}
+
+extern char **environ;
+
+void populate_environment_variables(struct dict *macros) {
+	char **array = environ;
+
+	while (*array != NULL) {
+		add_variable_from_environment(macros, *array);
+		++array;
+	}
 }
 
 void populate_automatic_macros(struct graph_node *node, struct dict *macros) {

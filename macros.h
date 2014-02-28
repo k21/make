@@ -11,6 +11,7 @@ void expand_macros(
 		struct string *output);
 
 void populate_builtin_macros(struct dict *macros);
+void populate_environment_variables(struct dict *macros);
 void populate_automatic_macros(struct graph_node *node, struct dict *macros);
 
 #endif
