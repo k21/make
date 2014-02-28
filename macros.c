@@ -90,8 +90,8 @@ void populate_builtin_macros(struct dict *macros) {
 	set(macros, "LEX", "lex");
 	set(macros, "LFLAGS", "");
 	set(macros, "LDFLAGS", "");
-	set(macros, "CC", "c99");
-	set(macros, "CFLAGS", "-O");
+	set(macros, "CC", "cc");
+	set(macros, "CFLAGS", "");
 	set(macros, "FC", "fort77");
 	set(macros, "FFLAGS", "-O 1");
 	set(macros, "GET", "get");
