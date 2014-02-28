@@ -28,15 +28,38 @@ static struct graph_node *next_node_needing_update(struct graph *graph) {
 static pid_t start_job(
 		struct graph_node *node,
 		struct string *command,
-		struct dict *macros) {
+		struct dict *macros,
+		int *ignore_errors) {
 	struct string *expanded = string_init("");
+	int echo = 1;
 	const char *cstr;
 	pid_t pid;
 
 	populate_automatic_macros(node, macros);
 	expand_macros(command, macros, expanded);
 	cstr = string_get_cstr(expanded);
-	puts(cstr);
+
+	*ignore_errors = 0;
+
+	while (*cstr == '@' || *cstr == '-' || *cstr == '+') {
+		if (*cstr == '@') {
+			echo = 0;
+		} else if (*cstr == '-') {
+			*ignore_errors = 1;
+		}
+
+		/*
+		 * We do not support any command line options that would cause
+		 * '+' to have any effect, so we can ignore it here.
+		 */
+
+		++cstr;
+	}
+
+	if (echo) {
+		puts(cstr);
+	}
+
 	pid = fork();
 	if (pid < 0) {
 		fatal_error("fork call failed");
@@ -74,6 +97,7 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 	pid_t *pids;
 	struct graph_node **nodes;
 	struct list_item **commands;
+	int *ignore_errors;
 
 	int any_job_launchable = 0;
 	int error = 0;
@@ -83,6 +107,7 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 	pids = xcalloc(max_jobs, sizeof (*pids));
 	nodes = xcalloc(max_jobs, sizeof (*nodes));
 	commands = xcalloc(max_jobs, sizeof (*commands));
+	ignore_errors = xcalloc(max_jobs, sizeof (*ignore_errors));
 
 	node = next_node_needing_update(graph);
 	while (running_jobs > 0 || node != NULL) {
@@ -93,6 +118,7 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 			pids[i] = 0;
 			nodes[i] = node;
 			commands[i] = list_head(graph_node_get_commands(node));
+			ignore_errors[i] = 0;
 
 			any_job_launchable = 1;
 			++running_jobs;
@@ -108,7 +134,8 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 				}
 
 				command = list_get_data(commands[i]);
-				pids[i] = start_job(nodes[i], command, macros);
+				pids[i] = start_job(nodes[i], command, macros,
+						&ignore_errors[i]);
 			}
 			any_job_launchable = 0;
 		}
@@ -138,12 +165,16 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 
 			if (WIFEXITED(stat)) {
 				terminated = 1;
-				error = (WEXITSTATUS(stat) != 0);
+				if (!ignore_errors[i]) {
+					error = (WEXITSTATUS(stat) != 0);
+				}
 			}
 
 			if (WIFSIGNALED(stat)) {
 				terminated = 1;
-				error = 1;
+				if (!ignore_errors[i]) {
+					error = 1;
+				}
 			}
 
 			if (error) {
@@ -158,6 +189,7 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 
 		pids[i] = 0;
 		commands[i] = list_next(commands[i]);
+		ignore_errors[i] = 0;
 
 		if (commands[i] == NULL) {
 			graph_node_mark_resolved(graph, nodes[i]);
@@ -165,6 +197,7 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 			pids[i] = pids[running_jobs];
 			nodes[i] = nodes[running_jobs];
 			commands[i] = commands[running_jobs];
+			ignore_errors[i] = ignore_errors[running_jobs];
 
 			if (node == NULL) {
 				node = next_node_needing_update(graph);
@@ -177,6 +210,7 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 	free(pids);
 	free(nodes);
 	free(commands);
+	free(ignore_errors);
 
 	return (error ? 2 : 0);
 }
