@@ -113,7 +113,9 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 			any_job_launchable = 0;
 		}
 
-		if (running_jobs > 0) {
+		assert(running_jobs > 0);
+
+		{
 			int stat;
 			pid_t pid = -1;
 			int terminated;
@@ -152,23 +154,23 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 			if (!terminated) {
 				continue;
 			}
+		}
 
-			pids[i] = 0;
-			commands[i] = list_next(commands[i]);
+		pids[i] = 0;
+		commands[i] = list_next(commands[i]);
 
-			if (commands[i] == NULL) {
-				graph_node_mark_resolved(graph, nodes[i]);
-				--running_jobs;
-				pids[i] = pids[running_jobs];
-				nodes[i] = nodes[running_jobs];
-				commands[i] = commands[running_jobs];
+		if (commands[i] == NULL) {
+			graph_node_mark_resolved(graph, nodes[i]);
+			--running_jobs;
+			pids[i] = pids[running_jobs];
+			nodes[i] = nodes[running_jobs];
+			commands[i] = commands[running_jobs];
 
-				if (node == NULL) {
-					node = next_node_needing_update(graph);
-				}
-			} else {
-				any_job_launchable = 1;
+			if (node == NULL) {
+				node = next_node_needing_update(graph);
 			}
+		} else {
+			any_job_launchable = 1;
 		}
 	}
 
