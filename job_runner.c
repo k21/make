@@ -116,13 +116,13 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 				pids[i] = pids[running_jobs];
 				nodes[i] = nodes[running_jobs];
 				commands[i] = commands[running_jobs];
+
+				if (node == NULL) {
+					node = next_node_needing_update(graph);
+				}
 			} else {
 				any_job_launchable = 1;
 			}
-		}
-
-		if (node == NULL) {
-			node = next_node_needing_update(graph);
 		}
 	}
 
