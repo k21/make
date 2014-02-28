@@ -56,6 +56,8 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 	struct graph_node **nodes;
 	struct list_item **commands;
 
+	int any_job_launchable = 0;
+
 	assert(max_jobs > 0);
 
 	pids = xcalloc(max_jobs, sizeof (*pids));
@@ -72,16 +74,23 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 			nodes[i] = node;
 			commands[i] = list_head(graph_node_get_commands(node));
 
+			any_job_launchable = 1;
 			++running_jobs;
 			node = next_node_needing_update(graph);
 		}
 
-		for (i = 0; i < running_jobs; ++i) {
-			if (pids[i] == 0) {
+		if (any_job_launchable) {
+			for (i = 0; i < running_jobs; ++i) {
 				struct string *command;
+
+				if (pids[i] != 0) {
+					continue;
+				}
+
 				command = list_get_data(commands[i]);
 				pids[i] = start_job(nodes[i], command, macros);
 			}
+			any_job_launchable = 0;
 		}
 
 		if (running_jobs > 0) {
@@ -107,6 +116,8 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 				pids[i] = pids[running_jobs];
 				nodes[i] = nodes[running_jobs];
 				commands[i] = commands[running_jobs];
+			} else {
+				any_job_launchable = 1;
 			}
 		}
 
