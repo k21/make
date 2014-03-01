@@ -120,6 +120,8 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 			commands[i] = list_head(graph_node_get_commands(node));
 			ignore_errors[i] = 0;
 
+			assert(commands[i] != NULL);
+
 			any_job_launchable = 1;
 			++running_jobs;
 			node = next_node_needing_update(graph);

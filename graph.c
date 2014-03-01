@@ -207,7 +207,11 @@ void graph_process(struct graph *graph) {
 		struct graph_node *node = list_get_data(item);
 		item = list_next(item);
 
-		if (!node->visit) {
+		if (node->visit) {
+			if (node->needs_update && list_empty(node->commands)) {
+				fatal_error("No rule to make target");
+			}
+		} else {
 			graph_node_mark_resolved(graph, node);
 		}
 	}
