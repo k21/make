@@ -29,15 +29,26 @@ static size_t load_macro_name(
 	return (i);
 }
 
-int expand_macros(
+#define	MAX_MACRO_RECURSION_DEPTH	200
+
+static int expand_macros_impl(
 		const struct string *line,
 		struct dict *macros,
-		struct string *output) {
+		struct string *output,
+		size_t depth) {
+
 	const char *cstr = string_get_cstr(line);
 	size_t size = string_get_size(line);
 	size_t i;
-	struct string *macro_name = string_init("");
+	struct string *macro_name;
 	const struct string *macro_value;
+
+	if (depth > MAX_MACRO_RECURSION_DEPTH) {
+		fprintf(stderr, "Maximal macro recursion depth exceeded\n");
+		return (-1);
+	}
+
+	macro_name = string_init("");
 
 	for (i = 0; i < size; ++i) {
 		if (cstr[i] != '$') {
@@ -70,8 +81,9 @@ int expand_macros(
 
 			macro_value = dict_get(macros, macro_name);
 			if (macro_value != NULL) {
-				if (expand_macros(macro_value, macros,
-						output)) {
+				if (expand_macros_impl(macro_value, macros,
+						output, depth + 1)) {
+					string_destroy(macro_name);
 					return (-1);
 				}
 			}
@@ -83,6 +95,13 @@ int expand_macros(
 	string_destroy(macro_name);
 
 	return (0);
+}
+
+int expand_macros(
+		const struct string *line,
+		struct dict *macros,
+		struct string *output) {
+	return (expand_macros_impl(line, macros, output, 0));
 }
 
 static void sets(struct dict *dict,
