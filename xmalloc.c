@@ -1,9 +1,12 @@
-#include "error.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "xmalloc.h"
 
 static void *check_not_null(void *ptr) {
 	if (!ptr) {
-		fatal_error("Out of memory");
+		fprintf(stderr, "Out of memory\n");
+		exit(2);
 	}
 
 	return (ptr);
