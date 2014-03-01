@@ -6,7 +6,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "error.h"
 #include "graph.h"
 #include "job_runner.h"
 #include "list.h"
@@ -62,10 +61,13 @@ static pid_t start_job(
 
 	pid = fork();
 	if (pid < 0) {
-		fatal_error("fork call failed");
+		fprintf(stderr, "fork call failed\n");
+		string_destroy(expanded);
+		return (-1);
 	} else if (pid == 0) {
 		execl("/bin/sh", "sh", "-ce", cstr, NULL);
-		fatal_error("exec call failed");
+		fprintf(stderr, "exec call failed\n");
+		exit(1);
 	}
 
 	string_destroy(expanded);
@@ -138,8 +140,17 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 				command = list_get_data(commands[i]);
 				pids[i] = start_job(nodes[i], command, macros,
 						&ignore_errors[i]);
+				if (pids[i] < 0) {
+					error = 1;
+					break;
+				}
 			}
 			any_job_launchable = 0;
+		}
+
+		if (error) {
+			wait_for_jobs();
+			break;
 		}
 
 		assert(running_jobs > 0);
