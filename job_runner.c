@@ -78,6 +78,8 @@ static pid_t start_job(
 }
 
 static void wait_for_jobs() {
+	fprintf(stderr, "Waiting for running jobs to finish\n");
+
 	while (1) {
 		int stat;
 		pid_t pid;
@@ -115,6 +117,11 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 	ignore_errors = xcalloc(max_jobs, sizeof (*ignore_errors));
 
 	node = next_node_needing_update(graph);
+
+	if (node == NULL) {
+		printf("All specified targets are up to date\n");
+	}
+
 	while (running_jobs > 0 || node != NULL) {
 		size_t i;
 		while (node != NULL && running_jobs < max_jobs) {
@@ -194,6 +201,7 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 			}
 
 			if (error) {
+				fprintf(stderr, "A job has failed\n");
 				wait_for_jobs();
 				break;
 			}
