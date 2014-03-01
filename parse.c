@@ -1,6 +1,7 @@
+#include <stdio.h>
+
 #include "buffer.h"
 #include "dict.h"
-#include "error.h"
 #include "graph.h"
 #include "list.h"
 #include "macros.h"
@@ -131,7 +132,7 @@ static void escape_command(const struct string *input, struct string *output) {
 	}
 }
 
-static void load_macro(const struct string *line, size_t at,
+static int load_macro(const struct string *line, size_t at,
 		struct dict *macros) {
 	struct string *name;
 	struct string *value;
@@ -148,7 +149,8 @@ static void load_macro(const struct string *line, size_t at,
 	name_end = nonblank_end(line_cstr, name_begin, name_end);
 
 	if (name_begin == name_end) {
-		fatal_error("Empty macro name");
+		fprintf(stderr, "Empty macro name\n");
+		return (-1);
 	}
 
 	name = string_init_substring(line,
@@ -164,6 +166,8 @@ static void load_macro(const struct string *line, size_t at,
 
 	string_destroy(value);
 	string_destroy(name);
+
+	return (0);
 }
 
 static void get_token_list(const struct string *string, struct list *tokens) {
@@ -246,7 +250,7 @@ static void add_dependencies(
 	}
 }
 
-static void load_rule(
+static int load_rule(
 		const struct string *line,
 		struct dict *macros,
 		struct graph *graph,
@@ -272,7 +276,7 @@ static void load_rule(
 
 		if (empty) {
 			string_destroy(expanded);
-			return;
+			return (0);
 		}
 	}
 
@@ -283,7 +287,9 @@ static void load_rule(
 		struct list *dependencies_list;
 
 		if (expanded_cstr[at] != ':') {
-			fatal_error("Separator not found");
+			fprintf(stderr, "Separator not found\n");
+			string_destroy(expanded);
+			return (-1);
 		}
 
 		targets = string_init_substring(expanded, 0, at);
@@ -305,6 +311,8 @@ static void load_rule(
 	}
 
 	string_destroy(expanded);
+
+	return (0);
 }
 
 static void add_command(
@@ -326,7 +334,7 @@ static void add_command(
 	string_destroy(escaped);
 }
 
-void parse_file(int fd, struct graph *output, struct dict *macros) {
+int parse_file(int fd, struct graph *output, struct dict *macros) {
 	struct buffer *buffer = buffer_init(fd);
 	struct string *line = string_init("");
 	struct string *escaped_line = string_init("");
@@ -339,10 +347,23 @@ void parse_file(int fd, struct graph *output, struct dict *macros) {
 		escape_line(line, escaped_line);
 		at = find(escaped_line, '=');
 		if (string_get_cstr(escaped_line)[at] == '=') {
-			load_macro(escaped_line, at, macros);
+			if (load_macro(escaped_line, at, macros)) {
+				list_destroy(targets);
+				string_destroy(escaped_line);
+				string_destroy(line);
+				buffer_destroy(buffer);
+				return (-1);
+			}
 			stop = !load_line(buffer, line);
 		} else {
-			load_rule(escaped_line, macros, output, targets);
+			if (load_rule(escaped_line, macros, output, targets)) {
+				destroy_strings_in_list(targets);
+				list_destroy(targets);
+				string_destroy(escaped_line);
+				string_destroy(line);
+				buffer_destroy(buffer);
+				return (-1);
+			}
 			stop = !load_line(buffer, line);
 			while (!stop) {
 				const char *line_cstr = string_get_cstr(line);
@@ -359,12 +380,17 @@ void parse_file(int fd, struct graph *output, struct dict *macros) {
 		}
 	}
 
-	if (buffer_error(buffer)) {
-		fatal_error("Error reading the makefile");
-	}
-
 	list_destroy(targets);
 	string_destroy(escaped_line);
 	string_destroy(line);
+
+	if (buffer_error(buffer)) {
+		fprintf(stderr, "Error reading the makefile\n");
+		buffer_destroy(buffer);
+		return (-1);
+	}
+
 	buffer_destroy(buffer);
+
+	return (0);
 }

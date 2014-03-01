@@ -85,7 +85,11 @@ int main(int argc, char **argv) {
 		populate_builtin_macros(macros);
 		populate_environment_variables(macros);
 
-		parse_file(fd, graph, macros);
+		if (parse_file(fd, graph, macros)) {
+			graph_destroy(graph);
+			dict_destroy(macros);
+			return (2);
+		}
 
 		close(fd);
 
