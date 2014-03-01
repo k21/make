@@ -6,7 +6,6 @@
 #include <unistd.h>
 
 #include "dict.h"
-#include "error.h"
 #include "files.h"
 #include "graph.h"
 #include "job_runner.h"
