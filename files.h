@@ -4,7 +4,7 @@
 struct graph;
 struct graph_node;
 
-void update_file_info(struct graph_node *node);
-void update_all_files_info(struct graph *graph);
+int update_file_info(struct graph_node *node);
+int update_all_files_info(struct graph *graph);
 
 #endif

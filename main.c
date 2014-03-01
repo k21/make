@@ -134,7 +134,12 @@ int main(int argc, char **argv) {
 			}
 		}
 
-		update_all_files_info(graph);
+		if (update_all_files_info(graph)) {
+			dict_destroy(macros);
+			graph_destroy(graph);
+			return (2);
+		}
+
 		graph_process(graph);
 
 		{
