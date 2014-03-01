@@ -60,6 +60,7 @@ static pid_t start_job(
 
 	if (echo) {
 		puts(cstr);
+		fflush(stdout);
 	}
 
 	pid = fork();
