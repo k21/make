@@ -22,7 +22,6 @@ void string_clear(struct string *string);
 void string_set(struct string *string, const struct string *other);
 void string_reserve(struct string *string, size_t capacity);
 void string_append(struct string *string, const struct string *other);
-void string_append_cstr(struct string *string, const char *cstr);
 void string_append_char(struct string *string, char c);
 
 #endif

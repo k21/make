@@ -122,12 +122,6 @@ void string_append(struct string *string, const struct string *other) {
 	string->used = needed;
 }
 
-void string_append_cstr(struct string *string, const char *cstr) {
-	struct string *other = string_init(cstr);
-	string_append(string, other);
-	string_destroy(other);
-}
-
 void string_append_char(struct string *string, char c) {
 	if (string->used == string->capacity) {
 		string_reserve(string, 2 * string->capacity);
