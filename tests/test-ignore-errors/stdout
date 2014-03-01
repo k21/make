@@ -1,0 +1,8 @@
+touch b
+true
+touch e
+false
+touch f
+touch d
+false
+touch a
