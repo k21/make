@@ -140,7 +140,11 @@ int main(int argc, char **argv) {
 			return (2);
 		}
 
-		graph_process(graph);
+		if (graph_process(graph)) {
+			dict_destroy(macros);
+			graph_destroy(graph);
+			return (2);
+		}
 
 		{
 			int ret = run_jobs(graph, macros, (size_t)jobs);

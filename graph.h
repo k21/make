@@ -29,7 +29,7 @@ void graph_add_dependency(
 		struct graph_node *dependent,
 		struct graph_node *dependency);
 
-void graph_process(struct graph *graph);
+int graph_process(struct graph *graph);
 struct graph_node *graph_get_ready_node(struct graph *graph);
 
 

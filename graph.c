@@ -1,6 +1,6 @@
 #include <assert.h>
+#include <stdio.h>
 
-#include "error.h"
 #include "graph.h"
 #include "list.h"
 #include "string.h"
@@ -132,7 +132,7 @@ static void propagate_needs_update(struct graph_node *node) {
 	}
 }
 
-static void dfs(struct list *stack) {
+static int dfs(struct list *stack) {
 	while (!list_empty(stack)) {
 		struct graph_node *node;
 		struct list_item *item;
@@ -151,8 +151,9 @@ static void dfs(struct list *stack) {
 				if (dependency->visit == 0) {
 					list_push_front(stack, dependency);
 				} else if (dependency->visit == 1) {
-					fatal_error("Dependency graph "
-							"contains a cycle");
+					fprintf(stderr, "Dependency graph "
+							"contains a cycle\n");
+					return (-1);
 				} else {
 					assert(dependency->visit == 2);
 				}
@@ -171,9 +172,11 @@ static void dfs(struct list *stack) {
 			list_pop_front(stack);
 		}
 	}
+
+	return (0);
 }
 
-void graph_process(struct graph *graph) {
+int graph_process(struct graph *graph) {
 	struct list_item *item;
 	struct list *stack;
 
@@ -193,7 +196,10 @@ void graph_process(struct graph *graph) {
 		assert(node->visit == 0 || node->visit == 2);
 		if (node->target && !node->visit) {
 			list_push_front(stack, node);
-			dfs(stack);
+			if (dfs(stack)) {
+				list_destroy(stack);
+				return (-1);
+			}
 		}
 		assert(list_empty(stack));
 
@@ -209,12 +215,15 @@ void graph_process(struct graph *graph) {
 
 		if (node->visit) {
 			if (node->needs_update && list_empty(node->commands)) {
-				fatal_error("No rule to make target");
+				fprintf(stderr, "No rule to make target\n");
+				return (-1);
 			}
 		} else {
 			graph_node_mark_resolved(graph, node);
 		}
 	}
+
+	return (0);
 }
 
 struct graph_node *graph_get_ready_node(struct graph *graph) {
