@@ -69,20 +69,26 @@ int main(int argc, char **argv) {
 	}
 
 	{
-		struct graph *graph = graph_init();
-		struct dict *macros = dict_init();
+		struct graph *graph;
+		struct dict *macros;
 		int fd;
-
-		populate_builtin_macros(macros);
-		populate_environment_variables(macros);
 
 		fd = open(makefile, O_RDONLY);
 		if (fd < 0) {
 			fprintf(stderr, "Could not open the makefile\n");
 			return (2);
 		}
+
+		graph = graph_init();
+		macros = dict_init();
+
+		populate_builtin_macros(macros);
+		populate_environment_variables(macros);
+
 		parse_file(fd, graph, macros);
+
 		close(fd);
+
 
 		if (optind == argc) {
 			/* No targets specified, use the first target */
@@ -94,6 +100,8 @@ int main(int argc, char **argv) {
 			item = list_head(nodes);
 			if (item == NULL) {
 				fprintf(stderr, "No target specified\n");
+				graph_destroy(graph);
+				dict_destroy(macros);
 				return (2);
 			}
 			node = list_get_data(item);
@@ -113,6 +121,8 @@ int main(int argc, char **argv) {
 				if (node == NULL) {
 					fprintf(stderr, "Unknown target %s\n",
 							argv[i]);
+					graph_destroy(graph);
+					dict_destroy(macros);
 					return (2);
 				}
 
