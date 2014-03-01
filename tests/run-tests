@@ -1,0 +1,79 @@
+#!/bin/sh -e
+
+assert() {
+	echo '  Assert:' "$@"
+	if ! "$@"
+	then
+		echo 'Assert failed:' "$@"
+		exit 1
+	fi
+}
+
+prepare_test() {
+	TEST_NAME="$1"
+
+	rm -rf tmp
+	cp -R "$TEST_NAME/data" tmp
+	OPTS="`cat "$TEST_NAME/opts"`"
+	cp ../make tmp
+
+	touch -t 200001010000 tmp/a.dummy
+	touch -t 200001010100 tmp/b.dummy
+	touch -t 200001010200 tmp/c.dummy
+	touch -t 200001010300 tmp/d.dummy
+	touch -t 200001010400 tmp/e.dummy
+}
+
+run() {
+	(
+		export ENV_TEST=asdf
+		cd tmp && "$@" >stdout 2>stderr && echo 0 >retcode
+		echo $? >retcode
+	)
+}
+
+run_test() {
+	TEST_NAME="$1"
+	shift
+
+	echo 'Test' "$TEST_NAME"
+
+	prepare_test "$TEST_NAME"
+
+	echo "  Running \"make $OPTS\""
+
+	run ./make $OPTS
+
+	assert cmp tmp/stdout "$TEST_NAME/stdout"
+	assert cmp tmp/stderr "$TEST_NAME/stderr"
+	assert cmp tmp/retcode "$TEST_NAME/retcode"
+
+	if [ "$USE_VALGRIND" = 1 ]
+	then
+		VOPTS="--leak-check=full \
+--log-file=valgrind.log \
+--error-exitcode=42"
+		prepare_test "$TEST_NAME"
+
+		echo "  Running valgrind test"
+
+		run valgrind $VOPTS ./make $OPTS
+
+		assert cmp tmp/stdout "$TEST_NAME/stdout"
+		assert cmp tmp/stderr "$TEST_NAME/stderr"
+		assert cmp tmp/retcode "$TEST_NAME/retcode"
+	fi
+}
+
+cd "`dirname "$0"`"
+
+assert test -f ../make
+assert test -x ../make
+
+for test_name in test*
+do
+	run_test $test_name
+done
+
+echo 'All tests passed!'
+rm -rf tmp

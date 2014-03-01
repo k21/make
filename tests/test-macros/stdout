@@ -1,0 +1,9 @@
+a- a a a a  $
+c.dummy
+echo "a.dummy"
+a.dummy
+a.dummy e.dummy
+e.dummy
+a.dummy e.dummy a.dummy e.dummy
+
+touch c.dummy

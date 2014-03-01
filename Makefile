@@ -8,6 +8,9 @@ COMPILE_CMD = $(CC) -c $(CFLAGS) -o $@ $<
 make: $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
 
+check: make
+	cd tests && ./run-tests
+
 clean:
 	rm -f make $(OBJS)
 
