@@ -70,6 +70,10 @@ static int load_line(struct buffer *buffer, struct string *line) {
 	return (success);
 }
 
+/*
+ * Replaces occurences of the sequence of backslash, newline and any number
+ * of blanks with a single space
+ */
 static void escape_line(struct string *input, struct string *output) {
 	const char *cstr = string_get_cstr(input);
 	size_t len = string_get_size(input);
@@ -116,6 +120,10 @@ static void escape_line(struct string *input, struct string *output) {
 	}
 }
 
+/*
+ * Replaces occurences of the sequence of newline and an optional TAB character
+ * with a single newline character.
+ */
 static void escape_command(const struct string *input, struct string *output) {
 	const char *cstr = string_get_cstr(input);
 	size_t len = string_get_size(input);
@@ -132,6 +140,9 @@ static void escape_command(const struct string *input, struct string *output) {
 	}
 }
 
+/*
+ * Parses a line containing a macro definition.
+ */
 static int load_macro(const struct string *line, size_t at,
 		struct dict *macros) {
 	struct string *name;
@@ -170,6 +181,7 @@ static int load_macro(const struct string *line, size_t at,
 	return (0);
 }
 
+/* Splits the string by sequences of blank characters. */
 static void get_token_list(const struct string *string, struct list *tokens) {
 	const char *cstr = string_get_cstr(string);
 	size_t size = string_get_size(string);
@@ -218,6 +230,10 @@ static struct graph_node *get_or_add_node(
 	return (node);
 }
 
+/*
+ * Adds a dependency relation to all of the nodes in the list of dependencies
+ * to each node in the list of dependents.
+ */
 static void add_dependencies(
 		struct graph *graph,
 		struct list *dependents,
@@ -250,6 +266,7 @@ static void add_dependencies(
 	}
 }
 
+/* Parses rule definition or a dependency specification. */
 static int load_rule(
 		const struct string *line,
 		struct dict *macros,
@@ -318,6 +335,7 @@ static int load_rule(
 	return (0);
 }
 
+/* Adds the command to each node in the targets list */
 static void add_command(
 		struct graph *graph,
 		struct list *targets,

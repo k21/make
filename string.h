@@ -3,6 +3,12 @@
 
 #include <stddef.h>
 
+/*
+ * Simple structure wrapping a standard char array. It provides safer append
+ * with automatic memory allocation if it is needed and other useful functions.
+ * It can be converted to a standard C string using the string_get_cstr
+ * function.
+ */
 struct string;
 
 struct string *string_init(const char *cstr);

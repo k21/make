@@ -1,6 +1,11 @@
 #ifndef	LIST_H_
 #define	LIST_H_
 
+/*
+ * A simple doubly linked list structure storing a list of pointers to void.
+ * It does not take ownership of the data it stores, so it is the user's
+ * responsibility to free the stored data if it is not needed anymore.
+ */
 struct list;
 struct list_item;
 

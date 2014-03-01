@@ -1,6 +1,12 @@
 #ifndef	DICT_H_
 #define	DICT_H_
 
+/*
+ * Keeps a set of key/value pairs of two strings. The current implementation
+ * is a simple list with lookup time proportional to the total number
+ * of elements. It can be implemented more efficiently, for example as a
+ * hash table.
+ */
 struct dict;
 
 struct string;

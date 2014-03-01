@@ -1,6 +1,10 @@
 #ifndef	BUFFER_H_
 #define	BUFFER_H_
 
+/*
+ * Reads data from the provided file descriptor and keeps it in
+ * an internal buffer to improve performance.
+ */
 struct buffer;
 
 struct buffer *buffer_init(int fd);

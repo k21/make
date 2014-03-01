@@ -13,6 +13,9 @@
 #include "string.h"
 #include "xmalloc.h"
 
+/*
+ * Finds the next node that is ready to be updated and needs to be updated.
+ */
 static struct graph_node *next_node_needing_update(struct graph *graph) {
 	struct graph_node *node = graph_get_ready_node(graph);
 
@@ -24,6 +27,10 @@ static struct graph_node *next_node_needing_update(struct graph *graph) {
 	return (node);
 }
 
+/*
+ * Starts the command based on its command string and returns the PID of the
+ * newly spawned process.
+ */
 static pid_t start_job(
 		struct graph_node *node,
 		struct string *command,
@@ -78,6 +85,9 @@ static pid_t start_job(
 	return (pid);
 }
 
+/*
+ * Waits until all the jobs have finished running.
+ */
 static void wait_for_jobs() {
 	fprintf(stderr, "Waiting for running jobs to finish\n");
 
@@ -124,8 +134,11 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 	}
 
 	while (running_jobs > 0 || node != NULL) {
+		/* Loop while there is work to do */
+
 		size_t i;
 		while (node != NULL && running_jobs < max_jobs) {
+			/* If we can launch a new job, store it in our tables */
 			i = running_jobs;
 
 			pids[i] = 0;
@@ -141,6 +154,8 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 		}
 
 		if (any_job_launchable) {
+			/* If there is any job planned to run, start it */
+
 			for (i = 0; i < running_jobs; ++i) {
 				struct string *command;
 
@@ -164,6 +179,11 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 			break;
 		}
 
+		/*
+		 * There either was a job running at the start of the loop or
+		 * a new job was launched at the beginning of the loop. That
+		 * means we can now wait for a job to finish.
+		 */
 		assert(running_jobs > 0);
 
 		{
@@ -217,6 +237,11 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 		ignore_errors[i] = 0;
 
 		if (commands[i] == NULL) {
+			/*
+			 * If we did successfully complete all the commands
+			 * associated with the job, mark the node as resolved
+			 * and remove it from our tables.
+			 */
 			graph_node_mark_resolved(graph, nodes[i]);
 			--running_jobs;
 			pids[i] = pids[running_jobs];

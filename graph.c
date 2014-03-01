@@ -7,7 +7,13 @@
 #include "xmalloc.h"
 
 struct graph {
+	/* List of all of the nodes in the graph */
 	struct list *nodes;
+
+	/*
+	 * List of nodes that need to be updated and
+	 * all of their dependencies have been resolved.
+	 */
 	struct list *ready_nodes;
 };
 
@@ -16,10 +22,23 @@ struct graph_node {
 	struct list *commands;
 	struct list *dependencies;
 	struct list *dependents;
+
+	/*
+	 * If the dependency occurs multiple time in the makefile, it will be
+	 * multiple times in this list. This is used exclusively for the
+	 * $^ automatic variable.
+	 */
 	struct list *repeated_dependencies;
+
+	/* File modification time */
 	struct my_timespec time;
+
+	/* Non-zero if the user specified this node as the target to be built */
 	int target;
+
+	/* For internal usage only by the DFS algorithm */
 	int visit;
+
 	int needs_update;
 	int exists;
 	int resolved;
@@ -195,8 +214,10 @@ int graph_process(struct graph *graph) {
 
 		assert(node->visit == 0 || node->visit == 2);
 		if (node->target && !node->visit) {
+			/* Find all nodes this target depends on */
 			list_push_front(stack, node);
 			if (dfs(stack)) {
+				/* If you find a dependency cycle, abort */
 				list_destroy(stack);
 				return (-1);
 			}
@@ -214,11 +235,16 @@ int graph_process(struct graph *graph) {
 		item = list_next(item);
 
 		if (node->visit) {
+			/*
+			 * Check that we know how to built
+			 * all the nodes we need
+			 */
 			if (node->needs_update && list_empty(node->commands)) {
 				fprintf(stderr, "No rule to make target\n");
 				return (-1);
 			}
 		} else {
+			/* Mark nodes that we don't need as resolved. */
 			graph_node_mark_resolved(graph, node);
 		}
 	}

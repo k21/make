@@ -13,6 +13,13 @@
 #endif
 
 
+/*
+ * Not all systems implement sub-second precision modification time. The default
+ * is to read only the whole seconds part of the modification time. If the
+ * operating system supports sub-second precision, define the STAT_MTIME_NSEC
+ * macros as the relevant member of the stat structure. This can vary on
+ * different systems, but it is usually st_mtim.tv_nsec or st_mtimespec.tv_nsec.
+ */
 static void extract_mtime(const struct stat *stat, struct my_timespec *ts) {
 	ts->sec = stat->STAT_MTIME_SEC;
 #ifdef	STAT_MTIME_NSEC
@@ -34,7 +41,12 @@ int update_file_info(struct graph_node *node) {
 
 		extract_mtime(&stat_buf, &ts);
 		graph_node_set_time(node, &ts);
-	} else if (errno != ENOENT && errno != ENOTDIR) {
+	} else if (errno == ENOENT || errno == ENOTDIR) {
+		/*
+		 * If the file does not exist, it is not an error,
+		 * just don't set the modification time.
+		 */
+	} else {
 		fprintf(stderr, "Could not stat a file\n");
 		return (-1);
 	}

@@ -7,7 +7,16 @@
 
 struct string {
 	char *data;
+
+	/*
+	 * The length of the stored string including
+	 * the terminating null byte
+	 */
 	size_t used;
+
+	/*
+	 * The total size of the data array.
+	 */
 	size_t capacity;
 };
 
