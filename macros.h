@@ -5,7 +5,7 @@ struct dict;
 struct string;
 struct graph_node;
 
-void expand_macros(
+int expand_macros(
 		const struct string *line,
 		struct dict *macros,
 		struct string *output);

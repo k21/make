@@ -1,8 +1,9 @@
+#include <assert.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "dict.h"
-#include "error.h"
 #include "graph.h"
 #include "list.h"
 #include "macros.h"
@@ -21,13 +22,14 @@ static size_t load_macro_name(
 	}
 
 	if (!cstr[i]) {
-		fatal_error("Unclosed macro name");
+		fprintf(stderr, "Unclosed macro name\n");
+		return (0);
 	}
 
 	return (i);
 }
 
-void expand_macros(
+int expand_macros(
 		const struct string *line,
 		struct dict *macros,
 		struct string *output) {
@@ -43,8 +45,10 @@ void expand_macros(
 		} else {
 			++i;
 			if (i == size) {
-				fatal_error("Dollar sign "
-						"at the end of a line");
+				fprintf(stderr, "Dollar sign "
+						"at the end of a line\n");
+				string_destroy(macro_name);
+				return (-1);
 			}
 			if (cstr[i] == '(') {
 				i = load_macro_name(cstr,
@@ -59,9 +63,17 @@ void expand_macros(
 				string_append_char(macro_name, cstr[i]);
 			}
 
+			if (i == 0) {
+				string_destroy(macro_name);
+				return (-1);
+			}
+
 			macro_value = dict_get(macros, macro_name);
 			if (macro_value != NULL) {
-				expand_macros(macro_value, macros, output);
+				if (expand_macros(macro_value, macros,
+						output)) {
+					return (-1);
+				}
 			}
 
 			string_clear(macro_name);
@@ -69,6 +81,8 @@ void expand_macros(
 	}
 
 	string_destroy(macro_name);
+
+	return (0);
 }
 
 static void sets(struct dict *dict,
@@ -111,9 +125,7 @@ static void add_variable_from_environment(
 	struct string *name;
 	struct string *value;
 
-	if (at == NULL) {
-		fatal_error("Environment variable without '='");
-	}
+	assert(at != NULL);
 
 	name = string_init_data(str, (size_t)(at - str));
 	value = string_init(at + 1);

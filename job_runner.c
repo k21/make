@@ -35,7 +35,10 @@ static pid_t start_job(
 	pid_t pid;
 
 	populate_automatic_macros(node, macros);
-	expand_macros(command, macros, expanded);
+	if (expand_macros(command, macros, expanded)) {
+		string_destroy(expanded);
+		return (-1);
+	}
 	cstr = string_get_cstr(expanded);
 
 	*ignore_errors = 0;

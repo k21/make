@@ -259,7 +259,10 @@ static int load_rule(
 	const char *expanded_cstr;
 	size_t expanded_size;
 
-	expand_macros(line, macros, expanded);
+	if (expand_macros(line, macros, expanded)) {
+		string_destroy(expanded);
+		return (-1);
+	}
 	expanded_cstr = string_get_cstr(expanded);
 	expanded_size = string_get_size(expanded);
 
