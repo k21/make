@@ -2,8 +2,10 @@
 
 assert() {
 	echo '  Assert:' "$@"
-	if ! "$@"
+	if "$@"
 	then
+		: # assertion is ok
+	else
 		echo 'Assert failed:' "$@"
 		exit 1
 	fi
@@ -26,7 +28,8 @@ prepare_test() {
 
 run() {
 	(
-		export ENV_TEST=asdf
+		ENV_TEST=asdf
+		export ENV_TEST
 		cd tmp && "$@" >stdout 2>stderr && echo 0 >retcode
 		echo $? >retcode
 	)
