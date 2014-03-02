@@ -222,7 +222,10 @@ int run_jobs(struct graph *graph, struct dict *macros, size_t max_jobs) {
 			}
 
 			if (error) {
-				fprintf(stderr, "A job has failed\n");
+				const struct string *name;
+				name = graph_node_get_name(nodes[i]);
+				fprintf(stderr, "Building \"%s\" has failed\n",
+						string_get_cstr(name));
 				wait_for_jobs();
 				break;
 			}

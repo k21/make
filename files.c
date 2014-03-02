@@ -47,7 +47,8 @@ int update_file_info(struct graph_node *node) {
 		 * just don't set the modification time.
 		 */
 	} else {
-		fprintf(stderr, "Could not stat a file\n");
+		fprintf(stderr, "Could not stat file \"%s\"\n",
+				name_cstr);
 		return (-1);
 	}
 

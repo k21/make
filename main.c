@@ -123,8 +123,8 @@ int main(int argc, char **argv) {
 				string_destroy(node_name);
 
 				if (node == NULL) {
-					fprintf(stderr, "Unknown target %s\n",
-							argv[i]);
+					fprintf(stderr, "Unknown target "
+							"\"%s\"\n", argv[i]);
 					graph_destroy(graph);
 					dict_destroy(macros);
 					return (2);

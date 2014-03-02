@@ -170,8 +170,12 @@ static int dfs(struct list *stack) {
 				if (dependency->visit == 0) {
 					list_push_front(stack, dependency);
 				} else if (dependency->visit == 1) {
+					const char *name;
+					name = string_get_cstr(node->name);
 					fprintf(stderr, "Dependency graph "
-							"contains a cycle\n");
+							"contains a cycle "
+							"containing node "
+							"\"%s\"\n", name);
 					return (-1);
 				} else {
 					assert(dependency->visit == 2);
@@ -240,7 +244,8 @@ int graph_process(struct graph *graph) {
 			 * all the nodes we need
 			 */
 			if (node->needs_update && list_empty(node->commands)) {
-				fprintf(stderr, "No rule to make target\n");
+				fprintf(stderr, "No rule to make \"%s\"\n",
+						string_get_cstr(node->name));
 				return (-1);
 			}
 		} else {
