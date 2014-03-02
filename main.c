@@ -20,6 +20,8 @@ static void print_usage() {
 			"[-j jobs] [target]...\n");
 }
 
+#define	ERROR_EXIT_CODE	2
+
 int main(int argc, char **argv) {
 	int c;
 	const char *makefile = NULL;
@@ -34,7 +36,7 @@ int main(int argc, char **argv) {
 							"Could not change "
 							"directory to %s\n",
 							optarg);
-					return (2);
+					return (ERROR_EXIT_CODE);
 				}
 				break;
 
@@ -42,7 +44,7 @@ int main(int argc, char **argv) {
 				if (makefile != NULL) {
 					fprintf(stderr, "Option -f specified "
 							"multiple times\n");
-					return (2);
+					return (ERROR_EXIT_CODE);
 				}
 				makefile = optarg;
 				break;
@@ -53,13 +55,13 @@ int main(int argc, char **argv) {
 				if (errno != 0 || jobs < 1 || *endptr != '\0') {
 					fprintf(stderr, "Invalid numeric value "
 							"for option -j\n");
-					return (2);
+					return (ERROR_EXIT_CODE);
 				}
 				break;
 
 			default:
 				print_usage();
-				return (2);
+				return (ERROR_EXIT_CODE);
 		}
 	}
 
@@ -75,7 +77,7 @@ int main(int argc, char **argv) {
 		fd = open(makefile, O_RDONLY);
 		if (fd < 0) {
 			fprintf(stderr, "Could not open the makefile\n");
-			return (2);
+			return (ERROR_EXIT_CODE);
 		}
 
 		graph = graph_init();
@@ -88,7 +90,7 @@ int main(int argc, char **argv) {
 			close(fd);
 			graph_destroy(graph);
 			dict_destroy(macros);
-			return (2);
+			return (ERROR_EXIT_CODE);
 		}
 
 		close(fd);
@@ -106,7 +108,7 @@ int main(int argc, char **argv) {
 				fprintf(stderr, "No target specified\n");
 				graph_destroy(graph);
 				dict_destroy(macros);
-				return (2);
+				return (ERROR_EXIT_CODE);
 			}
 			node = list_get_data(item);
 			graph_node_mark_target(node);
@@ -127,7 +129,7 @@ int main(int argc, char **argv) {
 							"\"%s\"\n", argv[i]);
 					graph_destroy(graph);
 					dict_destroy(macros);
-					return (2);
+					return (ERROR_EXIT_CODE);
 				}
 
 				graph_node_mark_target(node);
@@ -137,13 +139,13 @@ int main(int argc, char **argv) {
 		if (update_all_files_info(graph)) {
 			dict_destroy(macros);
 			graph_destroy(graph);
-			return (2);
+			return (ERROR_EXIT_CODE);
 		}
 
 		if (graph_process(graph)) {
 			dict_destroy(macros);
 			graph_destroy(graph);
-			return (2);
+			return (ERROR_EXIT_CODE);
 		}
 
 		{
