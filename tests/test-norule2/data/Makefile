@@ -3,10 +3,9 @@ f: a.dummy c.dummy
 
 f: b.dummy
 
-e:
+e: e.dummy
 
 a: b d
-	touch a
 
 d: e
 d: f

@@ -19,7 +19,8 @@
 static struct graph_node *next_node_needing_update(struct graph *graph) {
 	struct graph_node *node = graph_get_ready_node(graph);
 
-	while (node != NULL && !graph_node_needs_update(node)) {
+	while (node != NULL && (!graph_node_needs_update(node) ||
+			list_empty(graph_node_get_commands(node)))) {
 		graph_node_mark_resolved(graph, node);
 		node = graph_get_ready_node(graph);
 	}

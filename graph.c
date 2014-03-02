@@ -243,7 +243,8 @@ int graph_process(struct graph *graph) {
 			 * Check that we know how to built
 			 * all the nodes we need
 			 */
-			if (node->needs_update && list_empty(node->commands)) {
+			if (node->needs_update && list_empty(node->commands) &&
+					list_empty(node->dependencies)) {
 				fprintf(stderr, "No rule to make \"%s\"\n",
 						string_get_cstr(node->name));
 				return (-1);
