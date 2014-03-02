@@ -165,6 +165,26 @@ requires certain caution when writing makefiles to make sure that independent
 targets do not overwrite each others files and do not use resources in a
 conflicting manner.
 
+TESTS
+-----
+
+The source distribution contains a test suite that helps confirm that the
+program operates correctly. To run the test suite, run `make check` in the
+source directory. If all goes well, you will see the following message
+
+    All tests passed!
+
+The tests check correct operation for valid inputs, they check functionality of
+most of the supported features, and also correct response to certain kinds
+of invalid inputs.
+
+It is also possible to use `valgrind` to check the program's memory usage when
+running the tests.
+To do so, make sure that `valgrind` is installed on your system and use
+the following command:
+
+    USE_VALGRIND=1 make check
+
 UNIMPLEMENTED FEATURES
 ----------------------
 
